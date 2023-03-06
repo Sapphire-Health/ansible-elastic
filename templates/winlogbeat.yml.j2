@@ -1,0 +1,17 @@
+winlogbeat.event_logs:
+  - name: Microsoft-Windows-PrintService/Operational
+    event_id: 307
+    ignore_older: 5m
+
+output.logstash:
+  hosts: ["{{ logstash_server }}"]
+  ssl.enabled: true
+  ssl.verification_mode: full
+  ssl.supported_protocols: [TLSv1.2, TLSv1.3]
+
+processors:
+  - add_host_metadata:
+      when.not.contains.tags: forwarded
+  - add_cloud_metadata: ~
+
+logging.level: info

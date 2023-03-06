@@ -1,0 +1,35 @@
+---
+  - name: Deploy winlogbeat
+    hosts: "{{ match_host }}"
+    gather_facts: true
+    tasks:
+      - name: Uninstall winlogbeat
+        #win_command: "C:/Windows/Temp/{{ package_name }} {{ install_params }}"
+        win_package:
+          #path: "C:\\Windows\\Temp\\{{ package_name }}"
+          product_id: "{{ product_id }}"
+          state: absent
+        when: uninstall is defined and uninstall == "yes"
+      - name: Download winlogbeat
+        win_get_url:
+          url: "{{ package_url }}{{ package_name }}"
+          dest: C:\Windows\Temp\
+      - name: Install/Update winlogbeat
+        #win_command: "C:/Windows/Temp/{{ package_name }} {{ install_params }}"
+        win_package:
+          path: "C:\\Windows\\Temp\\{{ package_name }}"
+          #product_id: "{{ product_id }}"
+          state: present
+          arguments: "{{ install_params }}"
+      - name: Delete winlogbeat msi
+        win_file:
+          path: "C:\\Windows\\Temp\\{{ package_name }}"
+          state: absent
+      - name: Create winlogbeat.yml
+        win_template:
+          src: "{{ winlogbeat_config | default('winlogbeat.yml.j2') }}"
+          dest: "{{ config_dir }}/winlogbeat.yml"
+      - name: Restart a service
+        win_service:
+          name: winlogbeat
+          state: restarted
