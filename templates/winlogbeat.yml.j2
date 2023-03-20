@@ -2,9 +2,12 @@ winlogbeat.event_logs:
   - name: Microsoft-Windows-PrintService/Operational
     event_id: 307
     ignore_older: 5m
+  - name: Microsoft-Windows-PrintService/Admin
+    event_id: 314, 372
+    ignore_older: 5m
 
 output.logstash:
-  hosts: ["{{ logstash_server }}"]
+  hosts: ["logstash01.lcmchealth.org:5044"]
   ssl.enabled: true
   ssl.verification_mode: full
   ssl.supported_protocols: [TLSv1.2, TLSv1.3]
